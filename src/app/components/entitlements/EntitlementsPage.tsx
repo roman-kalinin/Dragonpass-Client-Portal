@@ -5,6 +5,7 @@ import { TestModeBadge } from '../shared/TestModeBadge';
 import { EntitlementCard } from './EntitlementCard';
 import { EntitlementsEmptyState } from './EntitlementsEmptyState';
 import { EntitlementDetailPage } from './EntitlementDetailPage';
+import { ProductDetailView } from './ProductDetailView';
 import { EntitlementsSkeleton } from '../shared/Skeleton';
 import { MOCK_ENTITLEMENTS } from './mockEntitlements';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
@@ -72,10 +73,26 @@ export function EntitlementsPage({ activeView, onNavigate }: EntitlementsPagePro
   const [sortBy, setSortBy] = useState<'name' | 'usage' | 'remaining'>('name');
   const { environment } = useEnvironment();
 
+  // Handle category product detail route: entitlements:product:<slug>
+  const parts = activeView.split(':');
+  const isProductDetail = parts[1] === 'product' && parts[2];
+
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(t);
   }, []);
+
+  if (isProductDetail) {
+    return (
+      <PageShell activeView={activeView} onNavigate={onNavigate}>
+        <ProductDetailView
+          slug={parts[2]}
+          onBack={() => onNavigate('settings:categories')}
+          backLabel="Back to Categories"
+        />
+      </PageShell>
+    );
+  }
 
   if (loading) {
     return (
