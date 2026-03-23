@@ -3,6 +3,9 @@ import { Lock, CheckCircle } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '../../ui/dialog';
+import { SectionHeading } from '../../shared/SectionHeading';
+import { IconBox } from '../../shared/IconBox';
+import { Button } from '../../shared/Button';
 import type { ProductionAccessRequest } from '../../../types/portalTypes';
 
 export function ProductionAccessSection() {
@@ -21,17 +24,14 @@ export function ProductionAccessSection() {
 
   return (
     <div>
-      <h3 className="font-['Cabin',sans-serif] font-bold text-[15px] text-[#0a2333] mb-1">
-        Production Access
-      </h3>
-      <div className="h-px bg-[#e5e7eb] mb-4" />
+      <SectionHeading>Production Access</SectionHeading>
 
       {accessState.status === 'not_requested' && (
         <div className="bg-[#f9fafb] border border-[#e5e7eb] rounded-xl p-5">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#f1f5f9] flex items-center justify-center shrink-0">
+            <IconBox>
               <Lock size={18} className="text-[#6a7282]" />
-            </div>
+            </IconBox>
             <div className="flex-1">
               <h4 className="font-['Cabin',sans-serif] font-semibold text-[14px] text-[#0a2333]">
                 Production keys require approval
@@ -39,12 +39,9 @@ export function ProductionAccessSection() {
               <p className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282] mt-1">
                 Request production access when you're ready to go live. Your account manager will review and provision your production credentials.
               </p>
-              <button
-                onClick={() => setShowRequestModal(true)}
-                className="mt-4 px-4 py-2 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors"
-              >
+              <Button variant="primary" className="mt-4" onClick={() => setShowRequestModal(true)}>
                 Request Production Access
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -102,18 +99,8 @@ export function ProductionAccessSection() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              onClick={() => setShowRequestModal(false)}
-              className="px-4 py-2 rounded-lg border border-[#e5e7eb] font-['Cabin',sans-serif] text-[13px] text-[#45556c] hover:bg-[#f9fafb] transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmitRequest}
-              className="px-4 py-2 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors"
-            >
-              Submit Request
-            </button>
+            <Button variant="ghost" onClick={() => setShowRequestModal(false)}>Cancel</Button>
+            <Button variant="primary" onClick={handleSubmitRequest}>Submit Request</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

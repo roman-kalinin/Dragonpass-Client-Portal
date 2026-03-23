@@ -1,12 +1,14 @@
 import { FileText, ExternalLink } from 'lucide-react';
+import { Card } from '../../shared/Card';
+import { IconBox } from '../../shared/IconBox';
 
 export function ApiDocsCard() {
   return (
-    <div className="bg-white rounded-xl border border-[#e5e7eb] p-5 flex items-start justify-between">
+    <Card className="flex items-start justify-between">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#f1f5f9] flex items-center justify-center shrink-0">
+        <IconBox>
           <FileText size={18} className="text-[#0a2333]" />
-        </div>
+        </IconBox>
         <div>
           <h3 className="font-['Cabin',sans-serif] font-bold text-[15px] text-[#0a2333]">
             API Documentation
@@ -23,6 +25,6 @@ export function ApiDocsCard() {
         View Documentation
         <ExternalLink size={13} />
       </button>
-    </div>
+    </Card>
   );
 }

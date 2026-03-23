@@ -9,7 +9,7 @@ function EnvironmentToggle() {
     <div className="flex items-center h-9 rounded-lg border border-[#e5e7eb] overflow-hidden">
       <button
         onClick={() => setEnvironment('production')}
-        className={`h-full px-3 text-[12px] font-['Cabin',sans-serif] font-medium transition-colors ${
+        className={`cursor-pointer h-full px-3 text-[12px] font-['Cabin',sans-serif] font-medium transition-colors ${
           environment === 'production'
             ? 'bg-[#0a2333] text-white'
             : 'bg-white text-[#6a7282] hover:bg-[#f9fafb]'
@@ -19,7 +19,7 @@ function EnvironmentToggle() {
       </button>
       <button
         onClick={() => setEnvironment('test')}
-        className={`h-full px-3 text-[12px] font-['Cabin',sans-serif] font-medium transition-colors ${
+        className={`cursor-pointer h-full px-3 text-[12px] font-['Cabin',sans-serif] font-medium transition-colors ${
           environment === 'test'
             ? 'bg-[#FEF3C7] text-[#D97706] border-l border-[#F59E0B]'
             : 'bg-white text-[#6a7282] hover:bg-[#f9fafb] border-l border-[#e5e7eb]'
@@ -71,7 +71,7 @@ export function TopBar() {
           </div>
         </div>
         <EnvironmentToggle />
-        <button className="relative rounded-md w-9 h-9 flex items-center justify-center hover:bg-gray-100 transition-colors">
+        <button className="cursor-pointer relative rounded-md w-9 h-9 flex items-center justify-center hover:bg-gray-100 transition-colors">
           <Bell size={20} className="text-[#525252]" />
         </button>
       </div>

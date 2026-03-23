@@ -17,7 +17,7 @@ export function ActiveEntitlementsTab({ onManage, onBrowseCategories }: ActiveEn
   }
 
   return (
-    <div className="py-6 space-y-4">
+    <div className="py-4 grid grid-cols-3 gap-4">
       {entitlements.map(entitlement => (
         <EntitlementCard
           key={entitlement.id}

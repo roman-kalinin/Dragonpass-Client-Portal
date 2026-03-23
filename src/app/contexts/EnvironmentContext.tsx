@@ -10,9 +10,16 @@ interface EnvironmentContextValue {
 
 const EnvironmentContext = createContext<EnvironmentContextValue | null>(null);
 
-export function EnvironmentProvider({ children }: { children: ReactNode }) {
-  const [environment, setEnvironment] = useState<'test' | 'production'>('production');
+interface EnvironmentProviderProps {
+  children: ReactNode;
+  defaultEnvironment?: 'test' | 'production';
+  skipStorage?: boolean;
+}
+
+export function EnvironmentProvider({ children, defaultEnvironment = 'production', skipStorage = false }: EnvironmentProviderProps) {
+  const [environment, setEnvironment] = useState<'test' | 'production'>(defaultEnvironment);
   const [bannerDismissed, setBannerDismissed] = useState(() => {
+    if (skipStorage) return false;
     return sessionStorage.getItem('dp_banner_dismissed') === 'true';
   });
 
@@ -20,14 +27,14 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     setEnvironment(env);
     if (env === 'production') {
       setBannerDismissed(false);
-      sessionStorage.removeItem('dp_banner_dismissed');
+      if (!skipStorage) sessionStorage.removeItem('dp_banner_dismissed');
     }
-  }, []);
+  }, [skipStorage]);
 
   const dismissBanner = useCallback(() => {
     setBannerDismissed(true);
-    sessionStorage.setItem('dp_banner_dismissed', 'true');
-  }, []);
+    if (!skipStorage) sessionStorage.setItem('dp_banner_dismissed', 'true');
+  }, [skipStorage]);
 
   return (
     <EnvironmentContext.Provider

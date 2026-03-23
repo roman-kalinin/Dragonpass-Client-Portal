@@ -18,7 +18,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="bg-white w-[291px] flex flex-col border-r border-[rgba(0,0,0,0.04)] overflow-y-auto shrink-0">
+    <div className="bg-white w-[400px] flex flex-col border-r border-[rgba(0,0,0,0.04)] overflow-y-auto shrink-0">
       <div className="flex flex-col gap-6 p-[17px]">
         {/* Header */}
         <div className="flex flex-col gap-3">
@@ -58,7 +58,7 @@ export function Sidebar() {
                 <button
                   key={d.id}
                   onClick={() => handleDashboardClick(d.id)}
-                  className={`h-9 rounded-md w-full text-left pl-3 py-2 transition-colors font-['Cabin',sans-serif] font-medium text-[14px] leading-5 ${
+                  className={`cursor-pointer h-9 rounded-md w-full text-left pl-3 py-2 transition-colors font-['Cabin',sans-serif] font-medium text-[14px] leading-5 ${
                     state.activeDashboardId === d.id
                       ? 'bg-[#f1f5f9] text-[#0a2333]'
                       : 'text-[#6a7282] hover:bg-[#f9fafb] hover:text-[#0a2333]'
@@ -94,7 +94,7 @@ export function Sidebar() {
                   <button
                     key={d.id}
                     onClick={() => handleDashboardClick(d.id)}
-                    className={`h-9 rounded-md w-full text-left px-3 py-2 transition-colors font-['Cabin',sans-serif] font-medium text-[14px] leading-5 flex items-center justify-between ${
+                    className={`cursor-pointer h-9 rounded-md w-full text-left px-3 py-2 transition-colors font-['Cabin',sans-serif] font-medium text-[14px] leading-5 flex items-center justify-between ${
                       state.activeDashboardId === d.id
                         ? 'bg-[#f1f5f9] text-[#0a2333]'
                         : 'text-[#6a7282] hover:bg-[#f9fafb] hover:text-[#0a2333]'
@@ -111,7 +111,7 @@ export function Sidebar() {
             {/* New Dashboard Button */}
             <button
               onClick={handleNewDashboard}
-              className="h-9 rounded-lg border border-[#d1d5dc] w-full flex items-center justify-center text-[14px] font-['Cabin',sans-serif] font-medium text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
+              className="cursor-pointer h-9 rounded-lg border border-[#d1d5dc] w-full flex items-center justify-center text-[14px] font-['Cabin',sans-serif] font-medium text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
             >
               + New dashboard
             </button>

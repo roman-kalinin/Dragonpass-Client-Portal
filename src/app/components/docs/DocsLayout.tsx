@@ -1,87 +1,72 @@
 import { useState } from 'react';
-import { BookOpen, Layers, GitBranch, AlertTriangle, MousePointer, Shield, ArrowLeft } from 'lucide-react';
-import { DocArchitecture } from './DocArchitecture';
-import { DocStates } from './DocStates';
-import { DocFlows } from './DocFlows';
-import { DocEdgeCases } from './DocEdgeCases';
-import { DocInteractions } from './DocInteractions';
-import { DocErrorsA11y } from './DocErrorsA11y';
+import { ArrowLeft, Package, Key, ToggleLeft, LayoutDashboard } from 'lucide-react';
+import type { FlowTab } from './types';
+import { FlowViewer } from './FlowViewer';
+import { benefitsFrames } from './flows/BenefitsFlow';
+import { apiKeysFrames } from './flows/ApiKeysFlow';
+import { environmentFrames } from './flows/EnvironmentFlow';
+import { dashboardFrames } from './flows/DashboardFlow';
 
-const tabs = [
-  { id: 'architecture', label: 'Architecture', icon: Layers },
-  { id: 'states', label: 'States & Transitions', icon: GitBranch },
-  { id: 'flows', label: 'User Flows', icon: BookOpen },
-  { id: 'edge-cases', label: 'Edge Cases & Missing States', icon: AlertTriangle },
-  { id: 'interactions', label: 'Interaction Specs', icon: MousePointer },
-  { id: 'errors-a11y', label: 'Errors, A11y & Performance', icon: Shield },
+const tabs: FlowTab[] = [
+  { id: 'benefits', label: 'Benefits', icon: Package, frames: benefitsFrames },
+  { id: 'api-keys', label: 'API Keys', icon: Key, frames: apiKeysFrames },
+  { id: 'environment', label: 'Environment', icon: ToggleLeft, frames: environmentFrames },
+  { id: 'dashboard', label: 'Dashboard Builder', icon: LayoutDashboard, frames: dashboardFrames },
 ];
 
 export function DocsLayout({ onBack }: { onBack: () => void }) {
-  const [activeTab, setActiveTab] = useState('architecture');
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'architecture': return <DocArchitecture />;
-      case 'states': return <DocStates />;
-      case 'flows': return <DocFlows />;
-      case 'edge-cases': return <DocEdgeCases />;
-      case 'interactions': return <DocInteractions />;
-      case 'errors-a11y': return <DocErrorsA11y />;
-      default: return <DocArchitecture />;
-    }
-  };
+  const [activeTabId, setActiveTabId] = useState('benefits');
+  const activeTab = tabs.find(t => t.id === activeTabId) ?? tabs[0];
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#f8fafc] overflow-hidden">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#f9fafb]">
       {/* Header */}
-      <div className="bg-white border-b border-[#e2e8f0] px-8 py-5 flex items-center gap-6 shrink-0">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-[14px] font-['Cabin',sans-serif] text-[#62748e] hover:text-[#0a2333] transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to App
-        </button>
-        <div className="w-px h-6 bg-[#e2e8f0]" />
-        <div>
-          <h1 className="font-['Cabin',sans-serif] font-bold text-[22px] text-[#0a2333] leading-tight">
-            Dashboard Builder — Developer Documentation
-          </h1>
-          <p className="font-['Cabin',sans-serif] text-[13px] text-[#62748e] mt-0.5">
-            Comprehensive state & behavior specification · Visual reference for implementation
-          </p>
-        </div>
-        <div className="flex-1" />
-        <div className="flex items-center gap-2 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg px-3 py-1.5">
-          <div className="w-2 h-2 rounded-full bg-[#008236]" />
-          <span className="font-['Cabin',sans-serif] text-[12px] text-[#008236] font-medium">
-            15 states implemented · 0 missing
-          </span>
-        </div>
-      </div>
-
-      {/* Tab Nav */}
-      <div className="bg-white border-b border-[#e2e8f0] px-8 flex gap-1 shrink-0">
-        {tabs.map(tab => (
+      <div className="shrink-0 bg-white border-b border-[#e5e7eb]">
+        <div className="px-6 py-4 flex items-center gap-4">
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors font-['Cabin',sans-serif] text-[13px] font-medium ${
-              activeTab === tab.id
-                ? 'border-[#0a2333] text-[#0a2333]'
-                : 'border-transparent text-[#62748e] hover:text-[#0a2333] hover:border-[#cad5e2]'
-            }`}
+            onClick={onBack}
+            className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg border border-[#e5e7eb] hover:bg-[#f9fafb] transition-colors"
           >
-            <tab.icon size={14} />
-            {tab.label}
+            <ArrowLeft size={14} className="text-[#0a2333]" />
           </button>
-        ))}
+          <div>
+            <h1 className="font-['Cabin',sans-serif] font-bold text-[18px] text-[#0a2333]">
+              Dragonpass — Design Handoff
+            </h1>
+            <p className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
+              Flow documentation · Component states · Visual reference
+            </p>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="px-6 flex gap-0">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            const isActive = tab.id === activeTabId;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTabId(tab.id)}
+                className={`cursor-pointer flex items-center gap-1.5 px-4 py-2.5 border-b-2 transition-colors font-['Cabin',sans-serif] text-[13px] ${
+                  isActive
+                    ? 'border-[#0a2333] text-[#0a2333] font-semibold'
+                    : 'border-transparent text-[#6a7282] hover:text-[#0a2333]'
+                }`}
+              >
+                <Icon size={14} />
+                {tab.label}
+                <span className={`ml-1 text-[10px] tabular-nums ${isActive ? 'text-[#0a2333]/50' : 'text-[#9ca3af]'}`}>
+                  {tab.frames.length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
-        {renderContent()}
-      </div>
+      <FlowViewer frames={activeTab.frames} />
     </div>
   );
 }

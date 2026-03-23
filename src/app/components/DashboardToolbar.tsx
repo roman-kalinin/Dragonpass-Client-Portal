@@ -21,7 +21,10 @@ export function DashboardToolbar() {
 
   const handleSave = () => {
     dispatch({ type: 'SAVE_DASHBOARD' });
-    setTimeout(() => dispatch({ type: 'SAVE_COMPLETE' }), 800);
+    setTimeout(() => {
+      dispatch({ type: 'SAVE_COMPLETE' });
+      dispatch({ type: 'EXIT_EDIT_MODE' });
+    }, 800);
   };
 
   const handleExport = () => {
@@ -50,10 +53,11 @@ export function DashboardToolbar() {
           {/* Edit Dashboard */}
           <button
             onClick={() => {
-              if (activeDashboard) dispatch({ type: 'ENTER_EDIT_MODE' });
+              if (activeDashboard && !activeDashboard.isSystem) dispatch({ type: 'ENTER_EDIT_MODE' });
             }}
-            disabled={!activeDashboard}
-            className="flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] disabled:opacity-40 transition-colors"
+            disabled={!activeDashboard || activeDashboard.isSystem}
+            className="cursor-pointer flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            title={activeDashboard?.isSystem ? 'System dashboards cannot be edited' : 'Edit Dashboard'}
           >
             <Edit2 size={14} className="text-[#0a0a0a]" />
             <span className="font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a0a0a]">Edit Dashboard</span>
@@ -61,7 +65,7 @@ export function DashboardToolbar() {
 
           {/* Share */}
           <button
-            className="flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] transition-colors"
+            className="cursor-pointer flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] transition-colors"
           >
             <Share2 size={14} className="text-[#0a0a0a]" />
             <span className="font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a0a0a]">Share</span>
@@ -71,7 +75,7 @@ export function DashboardToolbar() {
           <button
             onClick={handleExport}
             disabled={state.isExporting || !activeDashboard}
-            className="flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] disabled:opacity-50 transition-colors"
+            className="cursor-pointer flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] disabled:opacity-50 transition-colors"
           >
             {state.isExporting
               ? <Loader2 size={14} className="text-[#0a0a0a] animate-spin" />
@@ -80,7 +84,7 @@ export function DashboardToolbar() {
           </button>
 
           {/* More */}
-          <button className="w-9 h-9 rounded-lg border border-[#d1d5dc] bg-white flex items-center justify-center hover:bg-[#f9fafb] transition-colors">
+          <button className="cursor-pointer w-9 h-9 rounded-lg border border-[#d1d5dc] bg-white flex items-center justify-center hover:bg-[#f9fafb] transition-colors">
             <MoreVertical size={16} className="text-[#62748e]" />
           </button>
         </div>
@@ -90,13 +94,7 @@ export function DashboardToolbar() {
 
   // ── EDIT MODE TOOLBAR ─────────────────────────────────────
   return (
-    <div className="flex items-center gap-4 px-6 py-3 shrink-0 bg-[#f0f4f8] border-b border-[#e2e8f0]">
-      {/* Editing badge */}
-      <div className="flex items-center gap-1.5 shrink-0 bg-[#0a2333] rounded-md px-2.5 py-1">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
-        <span className="font-['Cabin',sans-serif] font-medium text-[11px] text-white uppercase tracking-wider">Editing</span>
-      </div>
-
+    <div className="flex items-center gap-4 px-6 py-3 shrink-0 border-b border-[#e2e8f0]">
       {/* Dashboard Name + Description */}
       <div className="flex flex-1 gap-3 items-center">
         <input
@@ -131,7 +129,7 @@ export function DashboardToolbar() {
         <div ref={dateRef} className="relative">
           <button
             onClick={() => setShowDateDropdown(!showDateDropdown)}
-            className="flex items-center gap-2 h-[34px] rounded-[10px] bg-[#f9fafb] border border-[#e5e7eb] px-3"
+            className="cursor-pointer flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-3 bg-white hover:bg-[#f9fafb] transition-colors"
           >
             <Calendar size={14} className="text-[#62748e]" />
             <span className="font-['Cabin',sans-serif] text-[14px] text-[#0a2333]">
@@ -148,7 +146,7 @@ export function DashboardToolbar() {
                     dispatch({ type: 'SET_DATE_RANGE', payload: dr });
                     setShowDateDropdown(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-[14px] font-['Cabin',sans-serif] hover:bg-[#f9fafb] transition-colors ${
+                  className={`cursor-pointer w-full text-left px-3 py-2 text-[14px] font-['Cabin',sans-serif] hover:bg-[#f9fafb] transition-colors ${
                     state.dateRange.value === dr.value ? 'text-[#0a2333] font-medium bg-[#f1f5f9]' : 'text-[#62748e]'
                   }`}
                 >
@@ -159,46 +157,14 @@ export function DashboardToolbar() {
           )}
         </div>
 
-        <div className="bg-[#e5e7eb] w-px h-6" />
-
-        {/* Export */}
-        <button
-          onClick={handleExport}
-          disabled={state.isExporting || !activeDashboard}
-          className="flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] disabled:opacity-50 transition-colors"
-        >
-          {state.isExporting ? <Loader2 size={16} className="text-[#62748e] animate-spin" /> : <Download size={16} className="text-[#62748e]" />}
-          <span className="font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a2333]">Export</span>
-        </button>
-
         {/* Save */}
         <button
           onClick={handleSave}
           disabled={state.isSaving || !activeDashboard}
-          className="flex items-center gap-2 h-9 rounded-lg border border-[#d1d5dc] px-4 bg-white hover:bg-[#f9fafb] disabled:opacity-50 transition-colors"
+          className="cursor-pointer flex items-center gap-2 h-9 rounded-lg bg-[#0a2333] px-4 hover:bg-[#152c3c] disabled:opacity-50 transition-colors"
         >
-          {state.isSaving ? <Loader2 size={16} className="text-[#62748e] animate-spin" /> : <Save size={16} className="text-[#62748e]" />}
-          <span className="font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a2333]">Save</span>
-        </button>
-
-        {/* Add Widget */}
-        <button
-          onClick={() => dispatch({ type: 'TOGGLE_WIDGET_LIBRARY' })}
-          disabled={!activeDashboard}
-          className="flex items-center gap-2 h-9 rounded-lg bg-[#0a2333] px-4 shadow-[0px_4px_6px_0px_rgba(28,57,142,0.1)] hover:bg-[#152c3c] disabled:opacity-50 transition-colors"
-        >
-          <Plus size={16} className="text-white" />
-          <span className="font-['Cabin',sans-serif] font-medium text-[14px] text-white">Add Widget</span>
-        </button>
-
-        {/* Done Editing */}
-        <button
-          onClick={() => dispatch({ type: 'EXIT_EDIT_MODE' })}
-          className="flex items-center gap-1.5 h-9 rounded-lg border border-[#d1d5dc] px-3 bg-white hover:bg-[#f9fafb] transition-colors"
-          title="Exit edit mode"
-        >
-          <X size={14} className="text-[#62748e]" />
-          <span className="font-['Cabin',sans-serif] font-medium text-[13px] text-[#62748e]">Done</span>
+          {state.isSaving ? <Loader2 size={16} className="text-white animate-spin" /> : <Save size={16} className="text-white" />}
+          <span className="font-['Cabin',sans-serif] font-medium text-[14px] text-white">Save</span>
         </button>
       </div>
     </div>

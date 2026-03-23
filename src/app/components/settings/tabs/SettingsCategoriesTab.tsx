@@ -1,4 +1,7 @@
 import { Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, ChevronRight } from 'lucide-react';
+import { Card } from '../../shared/Card';
+import { IconBox } from '../../shared/IconBox';
+import { Badge } from '../../shared/Badge';
 
 const categories = [
   { icon: Plane, name: 'Flights', slug: 'flights', active: true },
@@ -23,19 +26,17 @@ export function SettingsCategoriesTab({ onNavigate }: SettingsCategoriesTabProps
         {categories.map(cat => {
           const Icon = cat.icon;
           return (
-            <div key={cat.name} className="bg-white rounded-xl border border-[#e5e7eb] p-4">
+            <Card key={cat.name} padding="sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#f1f5f9] flex items-center justify-center">
+                  <IconBox size="sm">
                     <Icon size={16} className="text-[#0a2333]" />
-                  </div>
+                  </IconBox>
                   <span className="font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a2333]">{cat.name}</span>
                 </div>
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold font-['Cabin',sans-serif] ${
-                  cat.active ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#f3f4f6] text-[#374151]'
-                }`}>
+                <Badge variant={cat.active ? 'confirmed' : 'available'}>
                   {cat.active ? 'ACTIVE' : 'INACTIVE'}
-                </span>
+                </Badge>
               </div>
               <button
                 onClick={() => onNavigate?.(`entitlements:product:${cat.slug}`)}
@@ -44,7 +45,7 @@ export function SettingsCategoriesTab({ onNavigate }: SettingsCategoriesTabProps
                 View Details
                 <ChevronRight size={12} />
               </button>
-            </div>
+            </Card>
           );
         })}
       </div>

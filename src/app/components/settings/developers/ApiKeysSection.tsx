@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Info, Plus, X } from 'lucide-react';
+import { SectionHeading } from '../../shared/SectionHeading';
+import { Button } from '../../shared/Button';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { ApiKeysTable } from './ApiKeysTable';
 import { CreateKeyModal } from './CreateKeyModal';
@@ -75,10 +77,7 @@ export function ApiKeysSection() {
 
   return (
     <div>
-      <h3 className="font-['Cabin',sans-serif] font-bold text-[15px] text-[#0a2333] mb-1">
-        API Keys
-      </h3>
-      <div className="h-px bg-[#e5e7eb] mb-4" />
+      <SectionHeading>API Keys</SectionHeading>
       <p className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282] mb-4">
         Your API keys for the <span className="font-semibold capitalize">{environment}</span> environment.
       </p>
@@ -92,7 +91,7 @@ export function ApiKeysSection() {
               These are your test credentials. Use them to integrate and test the Dragonpass API. When you're ready for production, request access below.
             </p>
           </div>
-          <button onClick={dismissBanner} className="shrink-0 ml-2">
+          <button onClick={dismissBanner} className="cursor-pointer shrink-0 ml-2">
             <X size={14} className="text-[#2563eb]" />
           </button>
         </div>
@@ -105,13 +104,10 @@ export function ApiKeysSection() {
         onRevoke={setRevokeId}
       />
 
-      <button
-        onClick={() => setShowCreateModal(true)}
-        className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#e5e7eb] font-['Cabin',sans-serif] font-medium text-[13px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
-      >
+      <Button variant="ghost" className="mt-4" onClick={() => setShowCreateModal(true)}>
         <Plus size={14} />
         Create New Key
-      </button>
+      </Button>
 
       <CreateKeyModal
         open={showCreateModal}
@@ -130,18 +126,8 @@ export function ApiKeysSection() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              onClick={() => setRotateId(null)}
-              className="px-4 py-2 rounded-lg border border-[#e5e7eb] font-['Cabin',sans-serif] text-[13px] text-[#45556c] hover:bg-[#f9fafb] transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleRotateConfirm}
-              className="px-4 py-2 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors"
-            >
-              Rotate Key
-            </button>
+            <Button variant="ghost" onClick={() => setRotateId(null)}>Cancel</Button>
+            <Button variant="primary" onClick={handleRotateConfirm}>Rotate Key</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -156,15 +142,10 @@ export function ApiKeysSection() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              onClick={() => setRevokeId(null)}
-              className="px-4 py-2 rounded-lg border border-[#e5e7eb] font-['Cabin',sans-serif] text-[13px] text-[#45556c] hover:bg-[#f9fafb] transition-colors"
-            >
-              Cancel
-            </button>
+            <Button variant="ghost" onClick={() => setRevokeId(null)}>Cancel</Button>
             <button
               onClick={handleRevokeConfirm}
-              className="px-4 py-2 rounded-lg bg-[#dc2626] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#b91c1c] transition-colors"
+              className="cursor-pointer px-4 py-2 rounded-lg bg-[#dc2626] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#b91c1c] transition-colors"
             >
               Revoke Key
             </button>

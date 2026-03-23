@@ -1,5 +1,6 @@
 import { X, Plane, Building2, Car, Sofa, Smartphone, Ticket, Zap, Heart, Info, Calendar, User, CreditCard, MapPin } from 'lucide-react';
 import type { Order, OrderType } from './orderData';
+import { PanelSection, PanelSectionHeader, DetailRow } from '../shared/PanelSection';
 
 interface OrderDetailPanelProps {
   order: Order;
@@ -28,34 +29,6 @@ const typeIcons: Record<OrderType, React.ElementType> = {
   'health-wellness': Heart,
 };
 
-function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-3">
-      <Icon size={14} className="text-[#45556c]" />
-      <span className="font-['Cabin',sans-serif] font-semibold text-[11px] text-[#45556c] uppercase tracking-wider">
-        {title}
-      </span>
-    </div>
-  );
-}
-
-function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex justify-between items-start py-1.5">
-      <span className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282] min-w-[120px]">{label}</span>
-      <span className="font-['Cabin',sans-serif] text-[12px] text-[#0a2333] text-right font-medium">{value}</span>
-    </div>
-  );
-}
-
-function Section({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="px-5 py-4 border-t border-[#e5e7eb]">
-      {children}
-    </div>
-  );
-}
-
 export function OrderDetailPanel({ order, onClose }: OrderDetailPanelProps) {
   const TypeIcon = typeIcons[order.type];
   const typeLabel = typeLabels[order.type];
@@ -64,12 +37,12 @@ export function OrderDetailPanel({ order, onClose }: OrderDetailPanelProps) {
     amount === null ? '—' : `£${amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="flex-1 bg-black/20" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/20 cursor-pointer" onClick={onClose} />
 
-      {/* Panel */}
-      <div className="w-[380px] bg-white h-full flex flex-col shadow-2xl border-l border-[#e5e7eb]">
+      {/* Modal */}
+      <div className="relative w-[480px] max-h-[85vh] bg-white flex flex-col shadow-2xl rounded-xl border border-[#e5e7eb]">
         {/* Header */}
         <div className="px-5 py-4 border-b border-[#e5e7eb] shrink-0">
           <div className="flex items-center justify-between mb-2">
@@ -85,7 +58,7 @@ export function OrderDetailPanel({ order, onClose }: OrderDetailPanelProps) {
               </span>
               <button
                 onClick={onClose}
-                className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+                className="cursor-pointer w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
               >
                 <X size={15} className="text-[#45556c]" />
               </button>
@@ -116,8 +89,7 @@ export function OrderDetailPanel({ order, onClose }: OrderDetailPanelProps) {
         <div className="flex-1 overflow-y-auto">
 
           {/* General */}
-          <Section>
-            <SectionHeader icon={Info} title="General" />
+          <PanelSection icon={Info} title="General">
             <DetailRow label="Order ID" value={order.orderRef} />
             <DetailRow label="Type" value={typeLabel} />
             <DetailRow label="Status" value={
@@ -130,11 +102,10 @@ export function OrderDetailPanel({ order, onClose }: OrderDetailPanelProps) {
             {order.paid !== null && order.paid > 0 && (
               <DetailRow label="Customer Purchase" value={fmt(order.paid)} />
             )}
-          </Section>
+          </PanelSection>
 
           {/* Booking Information */}
-          <Section>
-            <SectionHeader icon={Calendar} title="Booking Information" />
+          <PanelSection icon={Calendar} title="Booking Information">
             <DetailRow label="Booking ID" value={order.bookingId} />
             <DetailRow label="Booking Ref" value={order.bookingRef} />
             <DetailRow label="Booking Date" value={order.bookingDate} />
@@ -153,12 +124,12 @@ export function OrderDetailPanel({ order, onClose }: OrderDetailPanelProps) {
             {order.telecomProvider && (
               <DetailRow label="Telecom Provider" value={order.telecomProvider} />
             )}
-          </Section>
+          </PanelSection>
 
           {/* Itinerary — Flights */}
           {order.type === 'flight' && (order.outboundSegment || order.inboundSegment) && (
-            <Section>
-              <SectionHeader icon={MapPin} title="Itinerary" />
+            <div className="px-5 py-4 border-t border-[#e5e7eb]">
+              <PanelSectionHeader icon={MapPin} title="Itinerary" />
               {order.outboundSegment && (
                 <div className="mb-4">
                   <div className="font-['Cabin',sans-serif] font-semibold text-[11px] text-[#0a2333] uppercase mb-2">Outbound</div>
@@ -205,29 +176,27 @@ export function OrderDetailPanel({ order, onClose }: OrderDetailPanelProps) {
                   </div>
                 </div>
               )}
-            </Section>
+            </div>
           )}
 
           {/* Customer Information */}
-          <Section>
-            <SectionHeader icon={User} title="Customer Information" />
+          <PanelSection icon={User} title="Customer Information">
             <DetailRow label="Name" value={order.customerName} />
             <DetailRow label="Email" value={order.customerEmail} />
             <DetailRow label="Phone" value={order.customerPhone} />
-          </Section>
+          </PanelSection>
 
           {/* Payment Information */}
-          <Section>
-            <SectionHeader icon={CreditCard} title={order.type === 'flight' || order.type === 'esim' ? 'Payment Breakdown' : 'Payment Information'} />
+          <PanelSection icon={CreditCard} title={order.type === 'flight' || order.type === 'esim' ? 'Payment Breakdown' : 'Payment Information'}>
             <DetailRow label="Base Price" value={fmt(order.basePrice)} />
             <DetailRow label="Taxes & Fees" value={fmt(order.taxesFees)} />
             <DetailRow label="Payment Method" value={order.paymentMethod} />
-          </Section>
+          </PanelSection>
 
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-[#e5e7eb] bg-[#f9fafb] px-5 py-3 flex items-center justify-between">
+        <div className="shrink-0 border-t border-[#e5e7eb] bg-[#f9fafb] rounded-b-xl px-5 py-3 flex items-center justify-between">
           <div>
             <div className="font-['Cabin',sans-serif] text-[10px] text-[#6a7282] uppercase tracking-wider">Benefit Funded</div>
             <div className="font-['Cabin',sans-serif] font-bold text-[14px] text-[#0a2333]">{fmt(order.funded)}</div>

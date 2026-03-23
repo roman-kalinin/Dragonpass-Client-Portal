@@ -1,16 +1,13 @@
 import { ArrowLeft, ExternalLink, Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, Globe, DollarSign, Star, TrendingUp, Shield, MapPin, Clock, Users, CreditCard, Calendar } from 'lucide-react';
 import { CATALOG_PRODUCTS } from './catalogData';
 import type { Product } from '../../types/portalTypes';
+import { Badge } from '../shared/Badge';
+import { Button } from '../shared/Button';
+import { IconBox } from '../shared/IconBox';
 
 const iconMap: Record<string, React.ElementType> = {
   Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart,
   Globe, DollarSign, Star, TrendingUp, Shield, MapPin, Clock, Users, CreditCard, Calendar,
-};
-
-const statusStyles: Record<string, string> = {
-  active: 'bg-[#dcfce7] text-[#166534]',
-  available: 'bg-[#f3f4f6] text-[#374151]',
-  requested: 'bg-[#FEF3C7] text-[#92400E]',
 };
 
 const statusLabels: Record<string, string> = {
@@ -35,20 +32,17 @@ export function ProductDetailView({ slug, onBack, backLabel = 'Back to Categorie
     <div className="flex-1 overflow-auto">
       <div className="max-w-3xl mx-auto px-8 py-6">
         {/* Back link */}
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-1.5 font-['Cabin',sans-serif] text-[13px] text-[#6a7282] hover:text-[#0a2333] transition-colors mb-6"
-        >
+        <Button variant="text" onClick={onBack} className="mb-6">
           <ArrowLeft size={14} />
           {backLabel}
-        </button>
+        </Button>
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[#f1f5f9] flex items-center justify-center">
+            <IconBox className="w-12 h-12 rounded-xl">
               <ProductIcon size={22} className="text-[#0a2333]" />
-            </div>
+            </IconBox>
             <div>
               <h1 className="font-['Cabin',sans-serif] font-bold text-[22px] text-[#0a2333]">
                 {product.name}
@@ -56,12 +50,26 @@ export function ProductDetailView({ slug, onBack, backLabel = 'Back to Categorie
               <p className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282]">{product.shortDescription}</p>
             </div>
           </div>
-          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold font-['Cabin',sans-serif] ${statusStyles[product.clientStatus]}`}>
+          <Badge variant={product.clientStatus as 'active' | 'available' | 'requested'} className="px-2.5 py-1 text-[11px]">
             {statusLabels[product.clientStatus]}
-          </span>
+          </Badge>
         </div>
 
         <div className="h-px bg-[#e5e7eb] mb-8" />
+
+        {/* Video overview */}
+        <section className="mb-8">
+          <h2 className="font-['Cabin',sans-serif] font-bold text-[16px] text-[#0a2333] mb-3">How It Works</h2>
+          <div className="rounded-xl overflow-hidden border border-[#e5e7eb] bg-[#000] aspect-video">
+            <iframe
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title={`How ${product.name} works`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
+        </section>
 
         {/* Overview */}
         <section className="mb-8">
@@ -78,10 +86,10 @@ export function ProductDetailView({ slug, onBack, backLabel = 'Back to Categorie
             {product.benefits.map((benefit, i) => {
               const BenefitIcon = iconMap[benefit.icon] || Star;
               return (
-                <div key={i} className="bg-[#f9fafb] rounded-xl border border-[#e5e7eb] p-4">
-                  <div className="w-9 h-9 rounded-lg bg-white border border-[#e5e7eb] flex items-center justify-center mb-3">
+                <div key={i} className="bg-white rounded-xl border border-[#e5e7eb] p-4">
+                  <IconBox size="sm" className="mb-3">
                     <BenefitIcon size={16} className="text-[#0a2333]" />
-                  </div>
+                  </IconBox>
                   <h4 className="font-['Cabin',sans-serif] font-semibold text-[13px] text-[#0a2333] mb-1">
                     {benefit.title}
                   </h4>
@@ -106,26 +114,16 @@ export function ProductDetailView({ slug, onBack, backLabel = 'Back to Categorie
 
         {/* CTA row */}
         <div className="flex items-center gap-4 pt-2 pb-8">
-          <button
-            onClick={() => window.open(product.documentationUrl, '_blank')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#e5e7eb] font-['Cabin',sans-serif] font-medium text-[13px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
-          >
+          <Button variant="ghost" onClick={() => window.open(product.documentationUrl, '_blank')} className="h-auto py-2.5 px-4 gap-2 text-[13px] text-[#0a2333]">
             View API Documentation
             <ExternalLink size={13} />
-          </button>
+          </Button>
 
           {product.clientStatus === 'available' && (
-            <button className="px-4 py-2.5 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors">
-              Request This Product
-            </button>
+            <Button variant="primary">Request This Product</Button>
           )}
           {product.clientStatus === 'active' && (
-            <button
-              onClick={onBack}
-              className="px-4 py-2.5 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors"
-            >
-              Manage Entitlements
-            </button>
+            <Button variant="primary" onClick={onBack}>Manage Entitlements</Button>
           )}
           {product.clientStatus === 'requested' && (
             <button

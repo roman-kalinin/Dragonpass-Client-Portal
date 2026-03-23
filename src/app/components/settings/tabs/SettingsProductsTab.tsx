@@ -1,4 +1,7 @@
 import { Monitor, Globe, Puzzle, MessageCircle } from 'lucide-react';
+import { Card } from '../../shared/Card';
+import { IconBox } from '../../shared/IconBox';
+import { Badge } from '../../shared/Badge';
 
 const channels = [
   { icon: Monitor, name: 'Mobile App White Label', status: 'LIVE', description: 'Branded mobile application for your customers' },
@@ -7,10 +10,10 @@ const channels = [
   { icon: MessageCircle, name: 'Digital Concierge Chat', status: 'INACTIVE', description: 'AI-powered chat concierge service' },
 ];
 
-const statusStyles: Record<string, string> = {
-  LIVE: 'bg-[#dcfce7] text-[#166534]',
-  INACTIVE: 'bg-[#f3f4f6] text-[#374151]',
-  REQUESTED: 'bg-[#FEF3C7] text-[#92400E]',
+const badgeVariant: Record<string, 'confirmed' | 'available' | 'pending'> = {
+  LIVE: 'confirmed',
+  INACTIVE: 'available',
+  REQUESTED: 'pending',
 };
 
 export function SettingsProductsTab() {
@@ -20,22 +23,20 @@ export function SettingsProductsTab() {
         {channels.map(channel => {
           const Icon = channel.icon;
           return (
-            <div key={channel.name} className="bg-white rounded-xl border border-[#e5e7eb] p-5">
+            <Card key={channel.name}>
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#f1f5f9] flex items-center justify-center">
+                  <IconBox>
                     <Icon size={18} className="text-[#0a2333]" />
-                  </div>
+                  </IconBox>
                   <div>
                     <h4 className="font-['Cabin',sans-serif] font-semibold text-[14px] text-[#0a2333]">{channel.name}</h4>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold font-['Cabin',sans-serif] ${statusStyles[channel.status]}`}>
-                      {channel.status}
-                    </span>
+                    <Badge variant={badgeVariant[channel.status] || 'pending'}>{channel.status}</Badge>
                   </div>
                 </div>
               </div>
               <p className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282]">{channel.description}</p>
-            </div>
+            </Card>
           );
         })}
       </div>

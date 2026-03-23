@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { TopBar } from '../TopBar';
 import { IconNav } from '../IconNav';
 import { TestModeBanner } from './TestModeBanner';
+import { Toast } from '../Toast';
 
 interface PageShellProps {
   activeView: string;
@@ -17,11 +18,12 @@ export function PageShell({ activeView, onNavigate, children }: PageShellProps) 
       <div className="flex flex-1 overflow-hidden">
         <IconNav activeView={activeView} onNavigate={onNavigate} />
         <main className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 flex flex-col overflow-hidden w-full max-w-[1440px] mx-auto">
+          <div className="flex-1 flex flex-col overflow-hidden w-full">
             {children}
           </div>
         </main>
       </div>
+      <Toast />
     </div>
   );
 }

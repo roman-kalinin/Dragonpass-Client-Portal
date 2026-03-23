@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PageShell } from '../shared/PageShell';
+import { PageHeader } from '../shared/PageHeader';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { SettingsProductsTab } from './tabs/SettingsProductsTab';
 import { SettingsCategoriesTab } from './tabs/SettingsCategoriesTab';
@@ -54,41 +55,39 @@ export function SettingsPage({ activeView, onNavigate }: SettingsPageProps) {
 
   return (
     <PageShell activeView={activeView} onNavigate={onNavigate}>
-      {/* Page header */}
-      <div className="px-8 pt-5 shrink-0">
-        <h1 className="font-['Cabin',sans-serif] font-bold text-[22px] text-[#0a2333]">Settings</h1>
-        <p className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282] mt-0.5 mb-4">
-          Manage your account, team, and developer settings
-        </p>
+      <div className="flex flex-col flex-1 overflow-hidden w-full max-w-[1440px] mx-auto">
+        <PageHeader title="Settings" description="Manage your account, team, and developer settings" className="pb-0" />
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-transparent h-auto border-b border-[#e5e7eb] rounded-none w-full justify-start gap-0 p-0 -mb-px">
-            {[
-              { value: 'products', label: 'Products' },
-              { value: 'categories', label: 'Categories' },
-              { value: 'team', label: 'Team' },
-              { value: 'developers', label: 'Developers' },
-              { value: 'general', label: 'General' },
-            ].map(tab => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="rounded-none border-0 border-b-2 border-b-transparent data-[state=active]:border-b-[#0a2333] data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none px-4 py-2.5 font-['Cabin',sans-serif] text-[13px] text-[#6a7282] hover:text-[#0a2333] data-[state=active]:text-[#0a2333] data-[state=active]:font-semibold"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
+        <div className="px-8 shrink-0">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="bg-transparent h-auto border-b border-[#e5e7eb] rounded-none w-full justify-start gap-0 p-0 -mb-px">
+              {[
+                { value: 'products', label: 'Products' },
+                { value: 'categories', label: 'Categories' },
+                { value: 'team', label: 'Team' },
+                { value: 'developers', label: 'Developers' },
+                { value: 'general', label: 'General' },
+              ].map(tab => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="rounded-none border-0 border-b-2 border-b-transparent data-[state=active]:border-b-[#0a2333] data-[state=active]:bg-transparent data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:outline-none px-4 py-2.5 font-['Cabin',sans-serif] text-[13px] text-[#6a7282] hover:text-[#0a2333] data-[state=active]:text-[#0a2333] data-[state=active]:font-semibold"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
 
-      {/* Tab content */}
-      <div className="flex-1 overflow-auto px-8">
-        {activeTab === 'products' && <SettingsProductsTab />}
-        {activeTab === 'categories' && <SettingsCategoriesTab onNavigate={onNavigate} />}
-        {activeTab === 'team' && <SettingsTeamTab />}
-        {activeTab === 'developers' && <DevelopersTab />}
-        {activeTab === 'general' && <SettingsGeneralTab />}
+        {/* Tab content */}
+        <div className="flex-1 overflow-auto px-8">
+          {activeTab === 'products' && <SettingsProductsTab />}
+          {activeTab === 'categories' && <SettingsCategoriesTab onNavigate={onNavigate} />}
+          {activeTab === 'team' && <SettingsTeamTab />}
+          {activeTab === 'developers' && <DevelopersTab />}
+          {activeTab === 'general' && <SettingsGeneralTab />}
+        </div>
       </div>
     </PageShell>
   );

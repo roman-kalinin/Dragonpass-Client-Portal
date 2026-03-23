@@ -23,7 +23,7 @@ export function UnsavedChangesDialog() {
           </div>
           <button
             onClick={() => dispatch({ type: 'SHOW_UNSAVED_WARNING', payload: false })}
-            className="w-6 h-6 rounded flex items-center justify-center hover:bg-gray-100"
+            className="cursor-pointer w-6 h-6 rounded flex items-center justify-center hover:bg-gray-100"
           >
             <X size={16} className="text-[#62748e]" />
           </button>
@@ -31,7 +31,7 @@ export function UnsavedChangesDialog() {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => dispatch({ type: 'DISCARD_CHANGES_AND_NAVIGATE' })}
-            className="h-9 rounded-lg border border-[#d1d5dc] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
+            className="cursor-pointer h-9 rounded-lg border border-[#d1d5dc] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
           >
             Discard
           </button>
@@ -43,7 +43,7 @@ export function UnsavedChangesDialog() {
                 dispatch({ type: 'DISCARD_CHANGES_AND_NAVIGATE' });
               }, 500);
             }}
-            className="h-9 rounded-lg bg-[#0a2333] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-white hover:bg-[#152c3c] transition-colors"
+            className="cursor-pointer h-9 rounded-lg bg-[#0a2333] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-white hover:bg-[#152c3c] transition-colors"
           >
             Save & Continue
           </button>
@@ -78,13 +78,13 @@ export function DeleteConfirmDialog() {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => dispatch({ type: 'SHOW_DELETE_CONFIRM', payload: null })}
-            className="h-9 rounded-lg border border-[#d1d5dc] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
+            className="cursor-pointer h-9 rounded-lg border border-[#d1d5dc] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={() => dispatch({ type: 'DELETE_DASHBOARD', payload: state.showDeleteConfirm! })}
-            className="h-9 rounded-lg bg-[#d4183d] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-white hover:bg-[#b91c1c] transition-colors"
+            className="cursor-pointer h-9 rounded-lg bg-[#d4183d] px-4 font-['Cabin',sans-serif] font-medium text-[14px] text-white hover:bg-[#b91c1c] transition-colors"
           >
             Delete
           </button>
