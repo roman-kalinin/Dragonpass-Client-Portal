@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, AlertTriangle, Pause, Play, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, AlertTriangle, Pause, Play, RotateCcw, TrendingUp } from 'lucide-react';
 import type { Entitlement } from '../../types/portalTypes';
 import { Badge } from '../shared/Badge';
 import { IconBox } from '../shared/IconBox';
@@ -9,6 +9,10 @@ import { useApp } from '../../store';
 const iconMap: Record<string, React.ElementType> = {
   Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart,
 };
+
+function formatGBP(amount: number) {
+  return `£${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+}
 
 function getPieColor(pct: number) {
   if (pct >= 90) return '#dc2626';
@@ -52,20 +56,42 @@ function UsageBar({ pct }: { pct: number }) {
   );
 }
 
+function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${checked ? 'bg-[#0a2333]' : 'bg-[#d1d5db]'}`}
+    >
+      <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${checked ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
+    </button>
+  );
+}
+
 interface EntitlementDetailPageProps {
   entitlement: Entitlement;
   activeView: string;
   onNavigate: (id: string) => void;
   onBack: () => void;
+  onTopUp?: (id: string) => void;
 }
 
-export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onBack }: EntitlementDetailPageProps) {
+export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onBack, onTopUp }: EntitlementDetailPageProps) {
   const { dispatch } = useApp();
   const [status, setStatus] = useState(entitlement.status);
+  const [capEnabled, setCapEnabled] = useState(entitlement.cap !== null);
+  const [capValue, setCapValue] = useState(entitlement.cap || 0);
+  const [alert80, setAlert80] = useState(entitlement.alertThresholds.thresholds.includes(80));
+  const [alert90, setAlert90] = useState(entitlement.alertThresholds.thresholds.includes(90));
   const Icon = iconMap[entitlement.productIcon] || Smartphone;
-  const pct = entitlement.cap ? Math.min(100, (entitlement.used / entitlement.cap) * 100) : 0;
-  const showWarning = pct >= 80;
+  const pct = capEnabled && capValue > 0 ? Math.min(100, (entitlement.used / capValue) * 100) : 0;
+  const hasCap = capEnabled && capValue > 0;
+  const showWarning = hasCap && pct >= 80;
   const warningLabel = pct >= 100 ? 'Cap reached' : pct >= 90 ? '90%+ used — approaching cap' : '80%+ used';
+
+  const usedGBP = entitlement.used * entitlement.unitCostGBP;
+  const remainingGBP = entitlement.remaining * entitlement.unitCostGBP;
+  const allocationGBP = entitlement.allocation * entitlement.unitCostGBP;
 
   function handleStatusAction() {
     if (status === 'active') {
@@ -108,6 +134,16 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
                 </div>
                 <p className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282] mt-0.5">{entitlement.description}</p>
               </div>
+              {/* Top Up button */}
+              {onTopUp && (
+                <button
+                  onClick={() => onTopUp(entitlement.id)}
+                  className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0a2333] font-['Cabin',sans-serif] text-[13px] font-medium text-white hover:bg-[#152c3c] transition-colors"
+                >
+                  <TrendingUp size={13} />
+                  Top Up
+                </button>
+              )}
               {/* Status action */}
               {status === 'active' && (
                 <button onClick={handleStatusAction} className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e5e7eb] font-['Cabin',sans-serif] text-[13px] font-medium text-[#45556c] hover:bg-[#f9fafb] transition-colors">
@@ -134,33 +170,54 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
               <div className="text-right">
                 <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider">Allocation</div>
                 <div className="font-['Cabin',sans-serif] font-bold text-[22px] text-[#0a2333] leading-tight">{entitlement.allocation.toLocaleString()}</div>
+                <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d]">{formatGBP(allocationGBP)}</div>
               </div>
               <div className="text-right">
                 <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider">Used</div>
                 <div className="font-['Cabin',sans-serif] font-bold text-[22px] text-[#0a2333] leading-tight">{entitlement.used.toLocaleString()}</div>
+                <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d]">{formatGBP(usedGBP)}</div>
               </div>
               <div className="text-right">
                 <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider">Remaining</div>
                 <div className="font-['Cabin',sans-serif] font-bold text-[22px] text-[#0a2333] leading-tight">{entitlement.remaining.toLocaleString()}</div>
+                <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d]">{formatGBP(remainingGBP)}</div>
               </div>
-              <UsageRing pct={pct} />
+              {hasCap && <UsageRing pct={pct} />}
             </div>
           </div>
 
           {/* Usage bar */}
           <div className="mt-4 space-y-1.5">
-            <UsageBar pct={pct} />
-            <div className="flex items-center justify-between">
-              <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
-                Cap: {entitlement.cap ? entitlement.cap.toLocaleString() : 'Unlimited'}
-              </span>
-              {showWarning && (
-                <div className="flex items-center gap-1">
-                  <AlertTriangle size={11} className="text-amber-600" />
-                  <span className="font-['Cabin',sans-serif] text-[11px] text-amber-700 font-medium">{warningLabel}</span>
+            {hasCap ? (
+              <>
+                <UsageBar pct={pct} />
+                <div className="flex items-center justify-between">
+                  <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
+                    Cap: {capValue.toLocaleString()}
+                  </span>
+                  {showWarning && (
+                    <div className="flex items-center gap-1">
+                      <AlertTriangle size={11} className="text-amber-600" />
+                      <span className="font-['Cabin',sans-serif] text-[11px] text-amber-700 font-medium">{warningLabel}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            ) : (
+              <>
+                <div className="w-full h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
+                  <div className="h-full rounded-full bg-[#34d399]" style={{ width: '100%', opacity: 0.3 }} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
+                    {entitlement.used.toLocaleString()} used
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold font-['Cabin',sans-serif] bg-[#f1f5f9] text-[#586e7d]">
+                    Unlimited
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -174,35 +231,54 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
                 Cap Configuration
               </h4>
               <div className="space-y-5">
-                <div>
-                  <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium block mb-1.5">
-                    Usage cap
-                  </label>
-                  <input
-                    type="number"
-                    defaultValue={entitlement.cap || ''}
-                    className="w-full h-9 px-3 rounded-lg border border-[#e5e7eb] text-[13px] font-['Cabin',sans-serif] text-[#0a2333] focus:outline-none focus:border-[#0a2333] bg-[#f9fafb]"
-                  />
+                {/* Cap toggle */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium">Enable usage cap</div>
+                    <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282] mt-0.5">
+                      {capEnabled ? 'Limit usage to a fixed number' : 'No usage cap — unlimited usage'}
+                    </div>
+                  </div>
+                  <ToggleSwitch checked={capEnabled} onChange={setCapEnabled} />
                 </div>
+
+                {capEnabled && (
+                  <div>
+                    <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium block mb-1.5">
+                      Usage cap
+                    </label>
+                    <input
+                      type="number"
+                      value={capValue}
+                      onChange={e => setCapValue(Number(e.target.value))}
+                      className="w-full h-9 px-3 rounded-lg border border-[#e5e7eb] text-[13px] font-['Cabin',sans-serif] text-[#0a2333] focus:outline-none focus:border-[#0a2333] bg-[#f9fafb]"
+                    />
+                  </div>
+                )}
+
+                {/* Alert thresholds */}
                 <div>
-                  <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium block mb-2">
-                    Alert thresholds
+                  <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium block mb-3">
+                    Usage alerts
                   </label>
-                  <div className="space-y-2.5">
-                    {[50, 80, 90, 100].map(threshold => (
-                      <label key={threshold} className="flex items-center gap-2.5 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          defaultChecked={entitlement.alertThresholds.thresholds.includes(threshold)}
-                          className="rounded border-[#d1d5db] text-[#0a2333] focus:ring-[#0a2333]"
-                        />
-                        <span className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333]">
-                          {threshold}% usage
-                        </span>
-                      </label>
-                    ))}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333]">Alert at 80%</div>
+                        <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">Get notified before approaching your limit</div>
+                      </div>
+                      <ToggleSwitch checked={alert80} onChange={setAlert80} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333]">Alert at 90%</div>
+                        <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">Final warning before hitting your cap</div>
+                      </div>
+                      <ToggleSwitch checked={alert90} onChange={setAlert90} />
+                    </div>
                   </div>
                 </div>
+
                 <div>
                   <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium block mb-1.5">
                     Alert recipients

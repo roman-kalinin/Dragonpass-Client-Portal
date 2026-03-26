@@ -7,8 +7,11 @@ import { EntitlementsEmptyState } from './EntitlementsEmptyState';
 import { EntitlementDetailPage } from './EntitlementDetailPage';
 import { ProductDetailView } from './ProductDetailView';
 import { EntitlementsSkeleton } from '../shared/Skeleton';
+import { AddBenefitModal } from './AddBenefitModal';
+import { TopUpModal } from './TopUpModal';
 import { MOCK_ENTITLEMENTS } from './mockEntitlements';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useApp } from '../../store';
 
 const SORT_OPTIONS = [
   { value: 'name', label: 'Name' },
@@ -67,13 +70,15 @@ interface EntitlementsPageProps {
 }
 
 export function EntitlementsPage({ activeView, onNavigate }: EntitlementsPageProps) {
+  const { dispatch } = useApp();
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'usage' | 'remaining'>('name');
+  const [addBenefitOpen, setAddBenefitOpen] = useState(false);
+  const [topUpEntitlementId, setTopUpEntitlementId] = useState<string | null>(null);
   const { environment } = useEnvironment();
 
-  // Handle category product detail route: entitlements:product:<slug>
   const parts = activeView.split(':');
   const isProductDetail = parts[1] === 'product' && parts[2];
 
@@ -103,15 +108,24 @@ export function EntitlementsPage({ activeView, onNavigate }: EntitlementsPagePro
   }
 
   const selectedEntitlement = selectedId ? MOCK_ENTITLEMENTS.find(e => e.id === selectedId) : null;
+  const topUpEntitlement = topUpEntitlementId ? MOCK_ENTITLEMENTS.find(e => e.id === topUpEntitlementId) : null;
 
   if (selectedEntitlement) {
     return (
-      <EntitlementDetailPage
-        entitlement={selectedEntitlement}
-        activeView={activeView}
-        onNavigate={onNavigate}
-        onBack={() => setSelectedId(null)}
-      />
+      <>
+        <EntitlementDetailPage
+          entitlement={selectedEntitlement}
+          activeView={activeView}
+          onNavigate={onNavigate}
+          onBack={() => setSelectedId(null)}
+          onTopUp={setTopUpEntitlementId}
+        />
+        <TopUpModal
+          entitlement={topUpEntitlement || null}
+          onClose={() => setTopUpEntitlementId(null)}
+          onConfirm={() => dispatch({ type: 'SET_TOAST', payload: { message: 'Benefit topped up successfully', type: 'success' } })}
+        />
+      </>
     );
   }
 
@@ -125,7 +139,7 @@ export function EntitlementsPage({ activeView, onNavigate }: EntitlementsPagePro
   }
 
   entitlements = [...entitlements].sort((a, b) => {
-    if (sortBy === 'usage') return (b.used / (b.cap || 1)) - (a.used / (a.cap || 1));
+    if (sortBy === 'usage') return (b.used / (b.cap || b.allocation)) - (a.used / (a.cap || a.allocation));
     if (sortBy === 'remaining') return a.remaining - b.remaining;
     return a.productName.localeCompare(b.productName);
   });
@@ -145,7 +159,10 @@ export function EntitlementsPage({ activeView, onNavigate }: EntitlementsPagePro
                 Manage your product entitlements and service allocations
               </p>
             </div>
-            <button className="cursor-pointer inline-flex items-center gap-1.5 bg-[#0a2333] text-white rounded-xl px-4 py-2.5 font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors shrink-0">
+            <button
+              onClick={() => setAddBenefitOpen(true)}
+              className="cursor-pointer inline-flex items-center gap-1.5 bg-[#0a2333] text-white rounded-xl px-4 py-2.5 font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors shrink-0"
+            >
               <Plus size={14} />
               Add Benefit
             </button>
@@ -178,12 +195,25 @@ export function EntitlementsPage({ activeView, onNavigate }: EntitlementsPagePro
                   key={entitlement.id}
                   entitlement={entitlement}
                   onClick={setSelectedId}
+                  onTopUp={setTopUpEntitlementId}
                 />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Modals */}
+      <AddBenefitModal
+        open={addBenefitOpen}
+        onClose={() => setAddBenefitOpen(false)}
+        onConfirm={() => dispatch({ type: 'SET_TOAST', payload: { message: 'New benefit added successfully', type: 'success' } })}
+      />
+      <TopUpModal
+        entitlement={topUpEntitlement || null}
+        onClose={() => setTopUpEntitlementId(null)}
+        onConfirm={() => dispatch({ type: 'SET_TOAST', payload: { message: 'Benefit topped up successfully', type: 'success' } })}
+      />
     </PageShell>
   );
 }

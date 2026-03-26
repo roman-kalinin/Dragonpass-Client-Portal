@@ -85,7 +85,8 @@ function DashboardComingSoonPage({ activeView, onNavigate }: { activeView: strin
           <PageHeader title="Dashboard" description="Your personalized overview and insights">
             <TestModeBadge />
           </PageHeader>
-          <div className="flex-1">
+          <div className="flex-1 overflow-auto px-8 pt-4">
+            <GettingStartedCard onNavigate={onNavigate} />
             <EmptyState
               icon={<LayoutGrid size={28} className="text-[#6a7282]" />}
               title="Dashboard — Coming Soon"

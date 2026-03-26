@@ -66,7 +66,7 @@ export function IconNav({ activeView = 'dashboard', onNavigate }: IconNavProps) 
       <div className="flex flex-col items-center py-3 border-t border-dashed border-[#cad5e2]">
         <button
           onClick={() => handleClick('settings')}
-          className={`w-[52px] h-[52px] rounded-md flex items-center justify-center transition-colors ${
+          className={`cursor-pointer w-[52px] h-[52px] rounded-md flex items-center justify-center transition-colors ${
             isActive('settings') ? 'bg-[#0a2333]' : 'hover:bg-gray-100'
           }`}
           title="Settings"

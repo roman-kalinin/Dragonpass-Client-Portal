@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { AlertTriangle, Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, MoreHorizontal, Play, Pause, RotateCcw, Settings, Trash2 } from 'lucide-react';
+import { AlertTriangle, Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, MoreHorizontal, Play, Pause, RotateCcw, Settings, Trash2, TrendingUp } from 'lucide-react';
 import type { Entitlement } from '../../types/portalTypes';
 import { Badge } from '../shared/Badge';
 import { IconBox } from '../shared/IconBox';
@@ -9,9 +9,14 @@ const iconMap: Record<string, React.ElementType> = {
   Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart,
 };
 
+function formatGBP(amount: number) {
+  return `£${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+}
+
 interface EntitlementCardProps {
   entitlement: Entitlement;
   onClick: (id: string) => void;
+  onTopUp?: (id: string) => void;
 }
 
 
@@ -54,7 +59,7 @@ function StatusActionButton({ status, onAction }: { status: Entitlement['status'
   );
 }
 
-function ActionMenu({ entitlement, onAction }: { entitlement: Entitlement; onAction: (action: string) => void }) {
+function ActionMenu({ onAction }: { onAction: (action: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -77,6 +82,13 @@ function ActionMenu({ entitlement, onAction }: { entitlement: Entitlement; onAct
       </button>
       {open && (
         <div className="absolute right-0 top-8 z-20 w-44 bg-white border border-[#e5e7eb] rounded-xl shadow-lg py-1 overflow-hidden">
+          <button
+            onClick={() => { onAction('topup'); setOpen(false); }}
+            className="cursor-pointer w-full flex items-center gap-2.5 px-3 py-2 font-['Cabin',sans-serif] text-[13px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
+          >
+            <TrendingUp size={13} className="text-[#6a7282]" />
+            Top up
+          </button>
           <button
             onClick={() => { onAction('edit'); setOpen(false); }}
             className="cursor-pointer w-full flex items-center gap-2.5 px-3 py-2 font-['Cabin',sans-serif] text-[13px] text-[#0a2333] hover:bg-[#f9fafb] transition-colors"
@@ -107,13 +119,18 @@ function UsageBar({ pct }: { pct: number }) {
   );
 }
 
-export function EntitlementCard({ entitlement, onClick }: EntitlementCardProps) {
+export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCardProps) {
   const { dispatch } = useApp();
   const [status, setStatus] = useState(entitlement.status);
   const Icon = iconMap[entitlement.productIcon] || Smartphone;
-  const pct = entitlement.cap ? Math.min(100, (entitlement.used / entitlement.cap) * 100) : 0;
-  const showWarning = pct >= 80;
+  const hasCap = entitlement.cap !== null && entitlement.cap !== undefined;
+  const pct = hasCap ? Math.min(100, (entitlement.used / entitlement.cap!) * 100) : 0;
+  const showWarning = hasCap && pct >= 80;
   const warningLabel = pct >= 100 ? 'Cap reached' : pct >= 90 ? '90%+ used — approaching cap' : '80%+ used';
+
+  const usedGBP = entitlement.used * entitlement.unitCostGBP;
+  const remainingGBP = entitlement.remaining * entitlement.unitCostGBP;
+  const allocationGBP = entitlement.allocation * entitlement.unitCostGBP;
 
   function handleStatusAction() {
     if (status === 'active') {
@@ -125,6 +142,12 @@ export function EntitlementCard({ entitlement, onClick }: EntitlementCardProps) 
     } else {
       setStatus('active');
       dispatch({ type: 'SET_TOAST', payload: { message: `${entitlement.productName} restarted`, type: 'success' } });
+    }
+  }
+
+  function handleMenuAction(action: string) {
+    if (action === 'topup' && onTopUp) {
+      onTopUp(entitlement.id);
     }
   }
 
@@ -152,7 +175,7 @@ export function EntitlementCard({ entitlement, onClick }: EntitlementCardProps) 
           <Badge variant={status === 'active' ? 'active' : status === 'paused' ? 'paused' : 'exhausted'}>
             {status === 'active' ? 'Active' : status === 'paused' ? 'Paused' : 'Exhausted'}
           </Badge>
-          <ActionMenu entitlement={entitlement} onAction={() => {}} />
+          <ActionMenu onAction={handleMenuAction} />
         </div>
       </div>
 
@@ -162,26 +185,45 @@ export function EntitlementCard({ entitlement, onClick }: EntitlementCardProps) 
         <div className="font-['Cabin',sans-serif] font-bold text-[32px] leading-none text-[#0a2333]">
           {entitlement.allocation.toLocaleString()}
         </div>
+        <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d] mt-0.5">
+          {formatGBP(allocationGBP)}
+        </div>
         <div className="font-['Cabin',sans-serif] text-[11px] text-[#9ca3af] mt-1">
-          Cap: {entitlement.cap ? entitlement.cap.toLocaleString() : 'Unlimited'}
+          {hasCap ? `Cap: ${entitlement.cap!.toLocaleString()}` : ''}
         </div>
       </div>
 
       {/* Usage bar */}
-      <div className="space-y-1.5">
-        <UsageBar pct={pct} />
-        <div className="flex items-center justify-between">
-          <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
-            {pct.toFixed(0)}% used
-          </span>
-          {showWarning && (
-            <div className="flex items-center gap-1">
-              <AlertTriangle size={10} className="text-amber-600" />
-              <span className="font-['Cabin',sans-serif] text-[11px] text-amber-700 font-medium">{warningLabel}</span>
-            </div>
-          )}
+      {hasCap ? (
+        <div className="space-y-1.5">
+          <UsageBar pct={pct} />
+          <div className="flex items-center justify-between">
+            <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
+              {pct.toFixed(0)}% used
+            </span>
+            {showWarning && (
+              <div className="flex items-center gap-1">
+                <AlertTriangle size={10} className="text-amber-600" />
+                <span className="font-['Cabin',sans-serif] text-[11px] text-amber-700 font-medium">{warningLabel}</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-1.5">
+          <div className="w-full h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
+            <div className="h-full rounded-full bg-[#34d399]" style={{ width: '100%', opacity: 0.3 }} />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
+              {entitlement.used.toLocaleString()} used
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold font-['Cabin',sans-serif] bg-[#f1f5f9] text-[#586e7d]">
+              Unlimited
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Secondary stats + action */}
       <div className="pt-4 border-t border-[#e5e7eb] flex items-end justify-between gap-4">
@@ -191,11 +233,17 @@ export function EntitlementCard({ entitlement, onClick }: EntitlementCardProps) 
             <div className="font-['Cabin',sans-serif] font-semibold text-[18px] text-[#0a2333]">
               {entitlement.used.toLocaleString()}
             </div>
+            <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d]">
+              {formatGBP(usedGBP)}
+            </div>
           </div>
           <div>
             <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider mb-1">Remaining</div>
             <div className="font-['Cabin',sans-serif] font-semibold text-[18px] text-[#0a2333]">
               {entitlement.remaining.toLocaleString()}
+            </div>
+            <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d]">
+              {formatGBP(remainingGBP)}
             </div>
           </div>
         </div>

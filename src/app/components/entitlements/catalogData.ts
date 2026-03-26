@@ -15,6 +15,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Integrate flight search and booking via the /flights/search and /flights/book endpoints. Requires passenger details, route information, and payment authorization. Supports both one-way and round-trip queries with flexible date matching.',
     documentationUrl: 'https://docs.dragonpass.com/flights',
     clientStatus: 'active',
+    unitCostGBP: 85.00,
   },
   {
     slug: 'hotels',
@@ -30,6 +31,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Use /hotels/search for property discovery with location, date, and guest parameters. Complete bookings via /hotels/book with room selection and guest details. Supports modification and cancellation flows.',
     documentationUrl: 'https://docs.dragonpass.com/hotels',
     clientStatus: 'active',
+    unitCostGBP: 65.00,
   },
   {
     slug: 'airport-lounge',
@@ -45,6 +47,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Search available lounges via /lounges/search using airport code and terminal. Issue digital passes with /lounges/passes/create. Supports real-time capacity checks and guest pass additions.',
     documentationUrl: 'https://docs.dragonpass.com/lounges',
     clientStatus: 'active',
+    unitCostGBP: 25.00,
   },
   {
     slug: 'airport-transfer',
@@ -60,6 +63,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Get quotes via /transfers/quote with pickup/dropoff coordinates and vehicle class. Book transfers with /transfers/book. Track active transfers via /transfers/{id}/status for real-time driver location.',
     documentationUrl: 'https://docs.dragonpass.com/transfers',
     clientStatus: 'active',
+    unitCostGBP: 45.00,
   },
   {
     slug: 'airport-dining',
@@ -75,6 +79,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Search dining options via /dining/search using airport code. Create reservations with /dining/reserve. Supports voucher-based payment via /dining/vouchers/create.',
     documentationUrl: 'https://docs.dragonpass.com/dining',
     clientStatus: 'available',
+    unitCostGBP: 30.00,
   },
   {
     slug: 'fast-track',
@@ -90,6 +95,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Check availability via /fast-track/availability with airport code and date. Issue passes with /fast-track/passes/create. Supports group bookings and return journey passes.',
     documentationUrl: 'https://docs.dragonpass.com/fast-track',
     clientStatus: 'active',
+    unitCostGBP: 18.00,
   },
   {
     slug: 'esims',
@@ -105,6 +111,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'List available plans via /esims/plans with destination country. Purchase and provision eSIMs with /esims/provision. Check usage via /esims/{id}/usage. Supports top-up via /esims/{id}/topup.',
     documentationUrl: 'https://docs.dragonpass.com/esims',
     clientStatus: 'active',
+    unitCostGBP: 12.50,
   },
   {
     slug: 'tickets',
@@ -120,6 +127,7 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Search events via /tickets/search with location and date filters. View seating options with /tickets/{eventId}/seats. Book tickets via /tickets/book with seat selection and attendee details.',
     documentationUrl: 'https://docs.dragonpass.com/tickets',
     clientStatus: 'available',
+    unitCostGBP: 22.00,
   },
   {
     slug: 'health-wellness',
@@ -135,5 +143,6 @@ export const CATALOG_PRODUCTS: Product[] = [
     integrationGuide: 'Search services via /wellness/search with airport code and service type. Book treatments with /wellness/book. Supports cancellation and rescheduling via /wellness/{id}/modify.',
     documentationUrl: 'https://docs.dragonpass.com/wellness',
     clientStatus: 'available',
+    unitCostGBP: 35.00,
   },
 ];

@@ -26,6 +26,9 @@ export interface Entitlement {
   productIcon: string;
   description: string;
   environment: 'test' | 'production';
+  benefitType: 'entitlement' | 'discount';
+  discountPercent?: number;
+  unitCostGBP: number;
   allocation: number;
   used: number;
   remaining: number;
@@ -37,6 +40,8 @@ export interface Entitlement {
     recipients: string[];
   };
   lastAlertedThreshold: number | null;
+  startDate: string;
+  endDate?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,6 +62,7 @@ export interface Product {
   integrationGuide: string;
   documentationUrl: string;
   clientStatus: 'active' | 'available' | 'requested';
+  unitCostGBP: number;
 }
 
 export interface OnboardingStep {
