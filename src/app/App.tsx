@@ -50,9 +50,6 @@ function DashboardBuilder({ activeView, onNavigate }: { activeView: string; onNa
             <div className="flex-1 flex flex-col overflow-hidden w-full max-w-[1440px] mx-auto">
               <DashboardToolbar />
               <div className="flex-1 overflow-auto">
-                <div className="px-6 pt-4">
-                  <GettingStartedCard onNavigate={onNavigate} />
-                </div>
                 <DashboardCanvas />
               </div>
             </div>

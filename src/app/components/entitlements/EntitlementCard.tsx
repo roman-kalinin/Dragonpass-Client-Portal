@@ -182,14 +182,18 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
       {/* Primary stat: Allocation */}
       <div>
         <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider mb-1">Allocation</div>
-        <div className="font-['Cabin',sans-serif] font-bold text-[32px] leading-none text-[#0a2333]">
-          {entitlement.allocation.toLocaleString()}
+        <div className="flex items-baseline justify-between">
+          <div className="font-['Cabin',sans-serif] font-bold text-[32px] leading-none text-[#0a2333]">
+            {entitlement.allocation.toLocaleString()}
+          </div>
+          {hasCap && (
+            <div className="font-['Cabin',sans-serif] text-[11px] text-[#9ca3af]">
+              Cap: {entitlement.cap!.toLocaleString()}
+            </div>
+          )}
         </div>
         <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d] mt-0.5">
           {formatGBP(allocationGBP)}
-        </div>
-        <div className="font-['Cabin',sans-serif] text-[11px] text-[#9ca3af] mt-1">
-          {hasCap ? `Cap: ${entitlement.cap!.toLocaleString()}` : ''}
         </div>
       </div>
 
@@ -198,15 +202,13 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
         <div className="space-y-1.5">
           <UsageBar pct={pct} />
           <div className="flex items-center justify-between">
-            <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
+            <span className={`font-['Cabin',sans-serif] text-[11px] font-medium ${pct >= 90 ? 'text-[#dc2626]' : pct >= 80 ? 'text-amber-600' : 'text-[#6a7282]'}`}>
               {pct.toFixed(0)}% used
+              {showWarning && (
+                <> — {pct >= 100 ? 'cap reached' : 'approaching cap'}</>
+              )}
             </span>
-            {showWarning && (
-              <div className="flex items-center gap-1">
-                <AlertTriangle size={10} className="text-amber-600" />
-                <span className="font-['Cabin',sans-serif] text-[11px] text-amber-700 font-medium">{warningLabel}</span>
-              </div>
-            )}
+            {showWarning && <AlertTriangle size={10} className={pct >= 90 ? 'text-[#dc2626]' : 'text-amber-600'} />}
           </div>
         </div>
       ) : (
@@ -219,7 +221,7 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
               {entitlement.used.toLocaleString()} used
             </span>
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold font-['Cabin',sans-serif] bg-[#f1f5f9] text-[#586e7d]">
-              Unlimited
+              ∞
             </span>
           </div>
         </div>
