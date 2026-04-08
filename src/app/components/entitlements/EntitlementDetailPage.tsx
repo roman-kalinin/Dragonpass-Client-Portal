@@ -437,11 +437,8 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
           </div>  {/* close px-8 py-2 */}
 
           {/* Recent Activity */}
-          <div className="px-8 pb-2">
+          <div className="px-8 pt-5 pb-3">
             <h3 className="font-['Cabin',sans-serif] font-bold text-[15px] text-[#0a2333] mb-3">Recent activity</h3>
-          </div>
-
-          <div className="px-8 py-3">
             <div className="flex items-center gap-3">
               <SearchInput
                 value={activitySearch}
@@ -481,7 +478,7 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
             )}
           </div>
 
-          <div className="px-8 pb-8">
+          <div className="px-8 pb-6">
             <div className="bg-white rounded-xl border border-[#e5e7eb] overflow-hidden">
               <div className="border-b border-[#e5e7eb] bg-[#f9fafb]">
                 <div className="flex items-center px-4 py-3">

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { AlertTriangle, Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, MoreHorizontal, Play, Pause, RotateCcw, Settings, Trash2, TrendingUp } from 'lucide-react';
+import { Plane, Building2, Sofa, Car, UtensilsCrossed, Zap, Smartphone, Ticket, Heart, MoreHorizontal, Play, Pause, RotateCcw, Settings, Trash2, TrendingUp } from 'lucide-react';
 import type { Entitlement } from '../../types/portalTypes';
 import { Badge } from '../shared/Badge';
 import { IconBox } from '../shared/IconBox';
@@ -18,7 +18,6 @@ interface EntitlementCardProps {
   onClick: (id: string) => void;
   onTopUp?: (id: string) => void;
 }
-
 
 function StatusActionButton({ status, onAction }: { status: Entitlement['status']; onAction: () => void }) {
   const handleClick = (e: React.MouseEvent) => {
@@ -110,12 +109,83 @@ function ActionMenu({ onAction }: { onAction: (action: string) => void }) {
   );
 }
 
-function UsageBar({ pct }: { pct: number }) {
-  const color = pct >= 90 ? '#dc2626' : pct >= 50 ? '#f59e0b' : '#34d399';
+function DonutArc({ pct, size = 48, unlimited = false }: { pct: number; size?: number; unlimited?: boolean }) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = (size - 8) / 2;
+  const circumference = 2 * Math.PI * r;
+  const filled = Math.min(pct / 100, 1) * circumference;
+  const isComplete = pct >= 100;
+  const isWarning = pct >= 80 && pct < 100;
+  const color = isComplete ? '#34d399' : isWarning ? '#f59e0b' : '#34d399';
+
+  if (unlimited) {
+    return (
+      <div className="shrink-0 relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="absolute inset-0">
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth="5" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg width="22" height="14" viewBox="-1 -1 26 14" fill="none">
+            {/* dim base path */}
+            <path
+              d="M12 6C12 6 9.5 1 5.5 1C2.46 1 0 3.24 0 6C0 8.76 2.46 11 5.5 11C9.5 11 12 6 12 6ZM12 6C12 6 14.5 11 18.5 11C21.54 11 24 8.76 24 6C24 3.24 21.54 1 18.5 1C14.5 1 12 6 12 6Z"
+              stroke="#e5e7eb"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+            {/* animated snake */}
+            <path
+              d="M12 6C12 6 9.5 1 5.5 1C2.46 1 0 3.24 0 6C0 8.76 2.46 11 5.5 11C9.5 11 12 6 12 6ZM12 6C12 6 14.5 11 18.5 11C21.54 11 24 8.76 24 6C24 3.24 21.54 1 18.5 1C14.5 1 12 6 12 6Z"
+              stroke="#9ca3af"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+              style={{
+                strokeDasharray: '20 46',
+                strokeDashoffset: 0,
+                animation: 'infinitySnake 2s linear infinite',
+              }}
+            />
+            <style>{`
+              @keyframes infinitySnake {
+                from { stroke-dashoffset: 0; }
+                to   { stroke-dashoffset: -66; }
+              }
+            `}</style>
+          </svg>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
-      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
-    </div>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="shrink-0">
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth="5" />
+      <circle
+        cx={cx} cy={cy} r={r} fill="none"
+        stroke={color} strokeWidth="5"
+        strokeDasharray={`${filled} ${circumference}`}
+        strokeLinecap="round"
+        transform={`rotate(-90 ${cx} ${cy})`}
+      />
+      {isComplete ? (
+        <>
+          <circle cx={cx} cy={cy} r={r - 4} fill="#34d399" />
+          <path
+            d={`M${cx - 7} ${cy} l5 5 l9 -9`}
+            stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"
+          />
+        </>
+      ) : (
+        <text x={cx} y={cy + 4} textAnchor="middle" fontSize="10" fontWeight="700" fill="#6a7282" fontFamily="Cabin, sans-serif">
+          {pct.toFixed(0)}%
+        </text>
+      )}
+    </svg>
   );
 }
 
@@ -125,8 +195,6 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
   const Icon = iconMap[entitlement.productIcon] || Smartphone;
   const hasCap = entitlement.cap !== null && entitlement.cap !== undefined;
   const pct = hasCap ? Math.min(100, (entitlement.used / entitlement.cap!) * 100) : 0;
-  const showWarning = hasCap && pct >= 80;
-  const warningLabel = pct >= 100 ? 'Cap reached' : pct >= 90 ? '90%+ used — approaching cap' : '80%+ used';
 
   const usedGBP = entitlement.used * entitlement.unitCostGBP;
   const remainingGBP = entitlement.remaining * entitlement.unitCostGBP;
@@ -154,99 +222,71 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
   return (
     <div
       onClick={() => onClick(entitlement.id)}
-      className="cursor-pointer bg-white rounded-xl border border-[#e5e7eb] p-6 hover:border-[#0a2333]/20 hover:shadow-sm transition-all flex flex-col gap-5"
+      className="group cursor-pointer bg-white rounded-xl border border-[#e5e7eb] p-6 hover:border-[#0a2333]/20 hover:shadow-sm transition-all flex flex-col"
     >
-      {/* Header: icon + name + badge + menu */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
+      {/* Header: icon + name/badge + menu */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <IconBox>
             <Icon size={18} className="text-[#0a2333]" />
           </IconBox>
-          <div>
-            <h3 className="font-['Cabin',sans-serif] font-bold text-[15px] text-[#0a2333] leading-tight">
-              {entitlement.productName}
-            </h3>
-            <p className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282] mt-0.5">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="font-['Cabin',sans-serif] font-bold text-[15px] text-[#0a2333] leading-tight truncate">
+                {entitlement.productName}
+              </h3>
+              <Badge variant={status === 'active' ? 'active' : status === 'paused' ? 'paused' : 'exhausted'}>
+                {status === 'active' ? 'Active' : status === 'paused' ? 'Paused' : 'Completed'}
+              </Badge>
+            </div>
+            <p className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282] mt-0.5 truncate">
               {entitlement.description}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
-          <Badge variant={status === 'active' ? 'active' : status === 'paused' ? 'paused' : 'exhausted'}>
-            {status === 'active' ? 'Active' : status === 'paused' ? 'Paused' : 'Exhausted'}
-          </Badge>
+        <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
           <ActionMenu onAction={handleMenuAction} />
         </div>
       </div>
 
-      {/* Primary stat: Allocation */}
-      <div>
-        <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider mb-1">Allocation</div>
-        <div className="flex items-baseline justify-between">
-          <div className="font-['Cabin',sans-serif] font-bold text-[32px] leading-none text-[#0a2333]">
-            {entitlement.allocation.toLocaleString()}
+      {/* Hero: donut + fraction */}
+      <div className="flex items-center gap-4 my-6">
+        {hasCap ? (
+          <DonutArc pct={pct} />
+        ) : (
+          <DonutArc pct={0} unlimited />
+        )}
+        <div className="flex items-center gap-2">
+          <div className="font-['Cabin',sans-serif] font-bold text-[32px] leading-none text-[#0a2333] tracking-tight">
+            {entitlement.used.toLocaleString()}
           </div>
-          {hasCap && (
-            <div className="font-['Cabin',sans-serif] text-[11px] text-[#9ca3af]">
-              Cap: {entitlement.cap!.toLocaleString()}
+          {hasCap ? (
+            <div className="font-['Cabin',sans-serif] text-[14px] text-[#9ca3af] leading-none">
+              / {entitlement.allocation.toLocaleString()} used
+            </div>
+          ) : (
+            <div className="font-['Cabin',sans-serif] text-[14px] text-[#9ca3af] leading-none">
+              of unlimited
             </div>
           )}
         </div>
-        <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d] mt-0.5">
-          {formatGBP(allocationGBP)}
-        </div>
       </div>
 
-      {/* Usage bar */}
-      {hasCap ? (
-        <div className="space-y-1.5">
-          <UsageBar pct={pct} />
-          <div className="flex items-center justify-between">
-            <span className={`font-['Cabin',sans-serif] text-[11px] font-medium ${pct >= 90 ? 'text-[#dc2626]' : pct >= 80 ? 'text-amber-600' : 'text-[#6a7282]'}`}>
-              {pct.toFixed(0)}% used
-              {showWarning && (
-                <> — {pct >= 100 ? 'cap reached' : 'approaching cap'}</>
-              )}
-            </span>
-            {showWarning && <AlertTriangle size={10} className={pct >= 90 ? 'text-[#dc2626]' : 'text-amber-600'} />}
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-1.5">
-          <div className="w-full h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
-            <div className="h-full rounded-full bg-[#34d399]" style={{ width: '100%', opacity: 0.3 }} />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282]">
-              {entitlement.used.toLocaleString()} used
-            </span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold font-['Cabin',sans-serif] bg-[#f1f5f9] text-[#586e7d]">
-              ∞
-            </span>
-          </div>
-        </div>
-      )}
+      <div className="flex-1" />
 
-      {/* Secondary stats + action */}
-      <div className="pt-4 border-t border-[#e5e7eb] flex items-end justify-between gap-4">
-        <div className="grid grid-cols-2 gap-4 flex-1">
-          <div>
-            <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider mb-1">Used</div>
-            <div className="font-['Cabin',sans-serif] font-semibold text-[18px] text-[#0a2333]">
-              {entitlement.used.toLocaleString()}
-            </div>
-            <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d]">
-              {formatGBP(usedGBP)}
-            </div>
+      {/* Money equivalents + action — pinned to bottom */}
+      <div className="-mx-6 -mb-6 px-6 py-3 rounded-b-xl bg-[#f5f7f9] flex items-center justify-between gap-4">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <div className="font-['Cabin',sans-serif] font-semibold text-[14px] text-[#0a2333]">
+            {formatGBP(usedGBP)}
           </div>
-          <div>
-            <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] uppercase tracking-wider mb-1">Remaining</div>
-            <div className="font-['Cabin',sans-serif] font-semibold text-[18px] text-[#0a2333]">
-              {entitlement.remaining.toLocaleString()}
+          {hasCap && (
+            <div className="font-['Cabin',sans-serif] text-[12px] text-[#9ca3af]">
+              / {formatGBP(allocationGBP)}
             </div>
-            <div className="font-['Cabin',sans-serif] text-[13px] text-[#586e7d]">
-              {formatGBP(remainingGBP)}
-            </div>
+          )}
+          <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] ml-2">
+            {formatGBP(remainingGBP)} left
           </div>
         </div>
         <StatusActionButton status={status} onAction={handleStatusAction} />

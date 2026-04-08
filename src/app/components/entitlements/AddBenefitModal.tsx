@@ -96,17 +96,15 @@ export function AddBenefitModal({ open, onClose, onConfirm }: AddBenefitModalPro
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="sm:max-w-[620px] p-0 bg-white border border-[#e5e7eb] rounded-xl overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-0">
-          <div className="flex items-center justify-between mb-1">
-            <DialogTitle className="font-['Cabin',sans-serif] font-bold text-[18px] text-[#0a2333]">
-              Add New Benefit
-            </DialogTitle>
-            <StepIndicator current={step} total={3} />
-          </div>
-          <DialogDescription className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282]">
+          <DialogTitle className="font-['Cabin',sans-serif] font-bold text-[18px] text-[#0a2333]">
+            Add New Benefit
+          </DialogTitle>
+          <DialogDescription className="font-['Cabin',sans-serif] text-[13px] text-[#6a7282] mb-3">
             {step === 1 && 'Select a product category for your new benefit.'}
             {step === 2 && 'Configure the benefit type, quantity, and dates.'}
             {step === 3 && 'Review and confirm your new benefit.'}
           </DialogDescription>
+          <StepIndicator current={step} total={3} />
         </DialogHeader>
 
         <div className="px-6 pb-6">
@@ -121,7 +119,7 @@ export function AddBenefitModal({ open, onClose, onConfirm }: AddBenefitModalPro
                   return (
                     <button
                       key={p.slug}
-                      onClick={() => setSelectedProduct(p.slug)}
+                      onClick={() => { setSelectedProduct(p.slug); setStep(2); }}
                       className={`cursor-pointer text-left p-4 rounded-xl border-2 transition-all ${
                         isSelected
                           ? 'border-[#0a2333] bg-[#f8fafc]'
@@ -145,16 +143,6 @@ export function AddBenefitModal({ open, onClose, onConfirm }: AddBenefitModalPro
                     </button>
                   );
                 })}
-              </div>
-              <div className="flex justify-end pt-2">
-                <button
-                  onClick={() => setStep(2)}
-                  disabled={!selectedProduct}
-                  className="cursor-pointer inline-flex items-center gap-1.5 px-5 h-10 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                  <ChevronRight size={14} />
-                </button>
               </div>
             </div>
           )}
