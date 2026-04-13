@@ -38,7 +38,7 @@ export function ApiKeysTable({ keys, onReveal, onRotate, onRevoke }: ApiKeysTabl
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   return (
-    <div className="bg-white rounded-xl border border-[#e5e7eb] overflow-hidden">
+    <div className="bg-white rounded-xl border border-[#e5e7eb]">
       {/* Header */}
       <div className="border-b border-[#e5e7eb] bg-[#f9fafb]">
         <div className="grid grid-cols-[1fr_2fr_1fr_1fr_100px_48px] gap-4 px-4 py-3">

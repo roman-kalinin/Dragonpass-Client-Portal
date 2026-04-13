@@ -222,9 +222,9 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
   return (
     <div
       onClick={() => onClick(entitlement.id)}
-      className="group cursor-pointer bg-white rounded-xl border border-[#e5e7eb] p-6 hover:border-[#0a2333]/20 hover:shadow-sm transition-all flex flex-col"
+      className="group cursor-pointer bg-white rounded-xl border border-[#e5e7eb] p-6 hover:border-[#0a2333]/20 hover:shadow-sm transition-all flex flex-col justify-between"
     >
-      {/* Header: icon + name/badge + menu */}
+      {/* Header: icon + name/badge + action button */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <IconBox>
@@ -244,13 +244,13 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
             </p>
           </div>
         </div>
-        <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="shrink-0">
           <ActionMenu onAction={handleMenuAction} />
         </div>
       </div>
 
       {/* Hero: donut + fraction */}
-      <div className="flex items-center gap-4 my-6">
+      <div className="flex items-center gap-4 py-8">
         {hasCap ? (
           <DonutArc pct={pct} />
         ) : (
@@ -272,21 +272,19 @@ export function EntitlementCard({ entitlement, onClick, onTopUp }: EntitlementCa
         </div>
       </div>
 
-      <div className="flex-1" />
-
-      {/* Money equivalents + action — pinned to bottom */}
-      <div className="-mx-6 -mb-6 px-6 py-3 rounded-b-xl bg-[#f5f7f9] flex items-center justify-between gap-4">
-        <div className="flex items-baseline gap-2 min-w-0">
-          <div className="font-['Cabin',sans-serif] font-semibold text-[14px] text-[#0a2333]">
+      {/* Footer: divider + money + action */}
+      <div className="-mx-6 -mb-6 px-6 py-4 border-t border-[#e5e7eb] flex items-center justify-between gap-4">
+        <div className="flex items-baseline gap-1.5">
+          <div className="font-['Cabin',sans-serif] font-semibold text-[12px] text-[#0a2333]">
             {formatGBP(usedGBP)}
           </div>
           {hasCap && (
-            <div className="font-['Cabin',sans-serif] text-[12px] text-[#9ca3af]">
+            <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">
               / {formatGBP(allocationGBP)}
             </div>
           )}
-          <div className="font-['Cabin',sans-serif] text-[11px] text-[#6a7282] ml-2">
-            {formatGBP(remainingGBP)} left
+          <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">
+            · {formatGBP(remainingGBP)} left
           </div>
         </div>
         <StatusActionButton status={status} onAction={handleStatusAction} />

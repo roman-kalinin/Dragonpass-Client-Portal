@@ -143,6 +143,9 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
   const [alert90, setAlert90] = useState(entitlement.alertThresholds.thresholds.includes(90));
   const [activitySearch, setActivitySearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [filterFrom, setFilterFrom] = useState('');
+  const [filterTo, setFilterTo] = useState('');
+  const [activePeriod, setActivePeriod] = useState<'today' | 'last7' | 'range'>('today');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const Icon = iconMap[entitlement.productIcon] || Smartphone;
@@ -342,70 +345,70 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
                 <h3 className="font-['Cabin',sans-serif] font-bold text-[15px] text-[#0a2333] mb-3">Cap configuration</h3>
                 <div className="bg-white rounded-xl border border-[#e5e7eb] p-5">
                   <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium">Enable usage cap</div>
-                    <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282] mt-0.5">
-                      {capEnabled ? 'Limit usage to a fixed number' : 'No usage cap — unlimited usage'}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium">Enable usage cap</div>
+                        <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282] mt-0.5">
+                          {capEnabled ? 'Limit usage to a fixed number' : 'No usage cap — unlimited usage'}
+                        </div>
+                      </div>
+                      <ToggleSwitch checked={capEnabled} onChange={(v) => {
+                        setCapEnabled(v);
+                        dispatch({ type: 'SET_TOAST', payload: { message: v ? 'Usage cap enabled' : 'Usage cap disabled', type: 'success' } });
+                      }} />
+                    </div>
+
+                    {capEnabled && (
+                      <div className="flex items-center gap-3">
+                        <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium shrink-0">Usage cap</label>
+                        <input
+                          type="number"
+                          value={capValue}
+                          onChange={e => setCapValue(Number(e.target.value))}
+                          className="flex-1 h-9 px-3 rounded-lg border border-[#e5e7eb] text-[13px] font-['Cabin',sans-serif] text-[#0a2333] focus:outline-none focus:border-[#0a2333] bg-[#f9fafb]"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333]">Alert at 80%</div>
+                        <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">Get notified before approaching your limit</div>
+                      </div>
+                      <ToggleSwitch checked={alert80} onChange={(v) => {
+                        setAlert80(v);
+                        dispatch({ type: 'SET_TOAST', payload: { message: v ? '80% alert enabled' : '80% alert disabled', type: 'success' } });
+                      }} />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333]">Alert at 90%</div>
+                        <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">Final warning before hitting your cap</div>
+                      </div>
+                      <ToggleSwitch checked={alert90} onChange={(v) => {
+                        setAlert90(v);
+                        dispatch({ type: 'SET_TOAST', payload: { message: v ? '90% alert enabled' : '90% alert disabled', type: 'success' } });
+                      }} />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium shrink-0">Alert recipients</label>
+                      <input
+                        type="text"
+                        defaultValue={entitlement.alertThresholds.recipients.join(', ')}
+                        className="flex-1 h-9 px-3 rounded-lg border border-[#e5e7eb] text-[13px] font-['Cabin',sans-serif] text-[#0a2333] focus:outline-none focus:border-[#0a2333] bg-[#f9fafb]"
+                      />
+                      <button
+                        onClick={() => dispatch({ type: 'SET_TOAST', payload: { message: 'Configuration saved', type: 'success' } })}
+                        className="cursor-pointer h-9 px-4 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors shrink-0"
+                      >
+                        Save
+                      </button>
                     </div>
                   </div>
-                  <ToggleSwitch checked={capEnabled} onChange={(v) => {
-                    setCapEnabled(v);
-                    dispatch({ type: 'SET_TOAST', payload: { message: v ? 'Usage cap enabled' : 'Usage cap disabled', type: 'success' } });
-                  }} />
                 </div>
-
-                {capEnabled && (
-                  <div className="flex items-center gap-3">
-                    <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium shrink-0">Usage cap</label>
-                    <input
-                      type="number"
-                      value={capValue}
-                      onChange={e => setCapValue(Number(e.target.value))}
-                      className="flex-1 h-9 px-3 rounded-lg border border-[#e5e7eb] text-[13px] font-['Cabin',sans-serif] text-[#0a2333] focus:outline-none focus:border-[#0a2333] bg-[#f9fafb]"
-                    />
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333]">Alert at 80%</div>
-                    <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">Get notified before approaching your limit</div>
-                  </div>
-                  <ToggleSwitch checked={alert80} onChange={(v) => {
-                    setAlert80(v);
-                    dispatch({ type: 'SET_TOAST', payload: { message: v ? '80% alert enabled' : '80% alert disabled', type: 'success' } });
-                  }} />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333]">Alert at 90%</div>
-                    <div className="font-['Cabin',sans-serif] text-[12px] text-[#6a7282]">Final warning before hitting your cap</div>
-                  </div>
-                  <ToggleSwitch checked={alert90} onChange={(v) => {
-                    setAlert90(v);
-                    dispatch({ type: 'SET_TOAST', payload: { message: v ? '90% alert enabled' : '90% alert disabled', type: 'success' } });
-                  }} />
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <label className="font-['Cabin',sans-serif] text-[13px] text-[#0a2333] font-medium shrink-0">Alert recipients</label>
-                  <input
-                    type="text"
-                    defaultValue={entitlement.alertThresholds.recipients.join(', ')}
-                    className="flex-1 h-9 px-3 rounded-lg border border-[#e5e7eb] text-[13px] font-['Cabin',sans-serif] text-[#0a2333] focus:outline-none focus:border-[#0a2333] bg-[#f9fafb]"
-                  />
-                  <button
-                    onClick={() => dispatch({ type: 'SET_TOAST', payload: { message: 'Configuration saved', type: 'success' } })}
-                    className="cursor-pointer h-9 px-4 rounded-lg bg-[#0a2333] text-white font-['Cabin',sans-serif] font-medium text-[13px] hover:bg-[#152c3c] transition-colors shrink-0"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>  {/* close space-y-4 */}
-            </div>  {/* close bg-white p-5 */}
-          </div>  {/* close cap config column */}
+              </div>
 
               {/* Daily Usage Chart */}
               <div>
@@ -427,7 +430,7 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
                     ]}
                     xKey="day"
                     bars={[{ dataKey: 'usage', name: 'Usage', fill: CHART_COLORS.teal }]}
-                    height={180}
+                    height={230}
                     barSize={16}
                     showLegend={false}
                   />
@@ -455,25 +458,51 @@ export function EntitlementDetailPage({ entitlement, activeView, onNavigate, onB
               </Button>
               <div className="flex-1" />
               <div className="flex items-center gap-2">
-                <Button variant="pill-active">
+                <Button variant={activePeriod === 'today' ? 'pill-active' : 'pill-inactive'} onClick={() => setActivePeriod('today')}>
                   Today
-                  <span className="bg-white/20 rounded-full px-1.5 text-[11px]">3</span>
+                  <span className={`rounded-full px-1.5 text-[11px] ${activePeriod === 'today' ? 'bg-white/20' : 'bg-[#e5e7eb]'}`}>3</span>
                 </Button>
-                <Button variant="pill-inactive">
+                <Button variant={activePeriod === 'last7' ? 'pill-active' : 'pill-inactive'} onClick={() => setActivePeriod('last7')}>
                   Last 7 days
-                  <span className="bg-[#e5e7eb] rounded-full px-1.5 text-[11px]">7</span>
+                  <span className={`rounded-full px-1.5 text-[11px] ${activePeriod === 'last7' ? 'bg-white/20' : 'bg-[#e5e7eb]'}`}>7</span>
                 </Button>
+                {activePeriod === 'range' ? (
+                  <div className="flex items-center gap-1.5 h-8 px-3 rounded-full border border-[#0a2333] bg-[#0a2333] font-['Cabin',sans-serif] text-[12px] font-medium text-white">
+                    <input
+                      type="date"
+                      value={filterFrom}
+                      onChange={e => setFilterFrom(e.target.value)}
+                      className="bg-transparent text-white text-[12px] font-['Cabin',sans-serif] outline-none w-[90px] [color-scheme:dark]"
+                    />
+                    <span className="text-white/60">–</span>
+                    <input
+                      type="date"
+                      value={filterTo}
+                      onChange={e => setFilterTo(e.target.value)}
+                      className="bg-transparent text-white text-[12px] font-['Cabin',sans-serif] outline-none w-[90px] [color-scheme:dark]"
+                    />
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setActivePeriod('range'); setFilterFrom(''); setFilterTo(''); }}
+                    className="cursor-pointer h-8 px-3 rounded-full border border-[#e5e7eb] font-['Cabin',sans-serif] text-[12px] font-medium text-[#45556c] hover:bg-[#f9fafb] transition-colors"
+                  >
+                    Select range
+                  </button>
+                )}
               </div>
             </div>
 
             {showFilters && (
               <div className="flex items-center gap-2 mt-3">
-                {['Status', 'Date Range', 'Customer'].map(filter => (
-                  <Button key={filter} variant="ghost" className="h-8 gap-1">
-                    {filter}
-                    <ChevronDown size={12} className="text-[#9ca3af]" />
-                  </Button>
-                ))}
+                <Button variant="ghost" className="h-8 gap-1">
+                  Status
+                  <ChevronDown size={12} className="text-[#9ca3af]" />
+                </Button>
+                <Button variant="ghost" className="h-8 gap-1">
+                  Customer
+                  <ChevronDown size={12} className="text-[#9ca3af]" />
+                </Button>
               </div>
             )}
           </div>
